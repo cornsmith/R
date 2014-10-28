@@ -1,24 +1,67 @@
-# Evaluative Functions
+# Evaluative Functions ----------------------------------------------------
+# Depends: ROCR
+
+# squared error
+se <- function (predicted, actual) (actual-predicted)^2
+
+# mean squared error
+mse <- function (predicted, actual) mean(se(predicted, actual))
+
+# root mean squared error
+rmse <- function (predicted, actual) sqrt(mse(predicted, actual))
+
+# absolute error
+ae <- function (predicted, actual) abs(actual-predicted)
+
+# mean absolute error
+mae <- function (predicted, actual) mean(ae(predicted, actual))
+
+# squared log error
+sle <- function (predicted, actual) (log(1+actual)-log(1+predicted))^2
+
+# mean squared log error
+msle <- function (predicted, actual) mean(sle(predicted, actual))
+
+# root mean squared log error
+rmsle <- function (predicted, actual) sqrt(msle(predicted, actual))
+
+# Relative square error
+rse <- function(predicted, actual){mean((predicted - actual)^2) / mean((mean(actual) - actual)^2)}
+
+# R-Square
+rs <- function(predicted, actual){1 - rse(predicted, actual)}
+
+
+# area under the ROC (AUC)
+auc <- function(predicted, actual){
+    r <- rank(predicted)
+    n_pos <- sum(actual==1)
+    n_neg <- length(actual) - n_pos
+    auc <- (sum(r[actual==1]) - n_pos*(n_pos+1)/2) / (n_pos*n_neg)
+    auc
+}
+
+# log loss
+ll <- function(predicted, actual){
+    score <- -(actual*log(predicted) + (1-actual)*log(1-predicted))
+    score[actual==predicted] <- 0
+    score[is.nan(score)] <- Inf
+    score
+}
+
+# mean log loss
+logLoss <- function(predicted, actual) mean(ll(predicted, actual))
+
 
 # Regression --------------------------------------------------------------
 EvalReg <- function(predicted, labels, cutoff = 0.5){
-    
-    # Root mean squared error
-    RMSE <- function(predicted, labels){sqrt(mean((predicted - labels)^2))}
-    
-    # Relative square error
-    RSE <- function(predicted, labels){mean((predicted - labels)^2) / mean((mean(labels) - labels)^2)}
-    
-    # R-Square
-    RSq <- function(predicted, labels){1 - RSE (predicted, labels)}
-    
     # Accuracy
     Acc <- function(predicted, labels, cutoff){mean((predicted > cutoff) == (labels > cutoff))}
     
     return(c(N = length(predicted),
-             RMSE = round(RMSE(predicted, labels), 4),
-             RSE = round(RSE(predicted, labels), 4),
-             RSq = round(RSq(predicted, labels), 4),
+             RMSE = round(rmse(predicted, labels), 4),
+             RSE = round(rse(predicted, labels), 4),
+             RSq = round(rs(predicted, labels), 4),
              Acc = round(Acc(predicted, labels, cutoff),4))
     )
 }
