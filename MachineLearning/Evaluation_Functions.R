@@ -49,6 +49,14 @@ ll <- function(predicted, actual){
     score
 }
 
+# multi-class log loss
+mcll <- function(predicted, actual, eps=1e-15) {
+    predicted[predicted < eps] <- eps
+    predicted[predicted > 1 - eps] <- 1 - eps
+    score <- -1/nrow(actual)*(sum(actual*log(predicted)))
+    score
+}
+
 # mean log loss
 logLoss <- function(predicted, actual) mean(ll(predicted, actual))
 
