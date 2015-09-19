@@ -1,6 +1,7 @@
 require(plyr); require(XML); require(RCurl)
 
 # need to set proxy options if applicable
+Sys.setenv(http_proxy="http://staff.com:8080")
 
 GoogleGeoCode <- function(address, type = "short", CoOrdsOnly = TRUE){
     # clean url
